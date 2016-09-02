@@ -317,7 +317,7 @@
 	phys = <&lane3 PHY_TYPE_SATA 1 1 125000000>;
 };
 
-&sdhci0 {
+/*&sdhci0 {
 	status = "okay";
 	disable-wp;
 	xlnx,mio_bank = <0>;
@@ -325,17 +325,18 @@
 	cap-power-off-card;
 	bus-width = <0x4>;
 	mmc-pwrseq = <&sdio_pwrseq>;
-	max-frequency = <1000000>;
+	max-frequency = <16000000>;
 	vqmmc-supply = <&wmmcsdio_fixed>;
+
 	#address-cells = <0x1>;
 	#size-cells = <0x0>;
 	wlcore: wlcore@2 {
 		compatible = "ti,wl1831";
 		reg = <2>;
 		interrupt-parent = <&gpio>;
-		interrupts = <19 IRQ_TYPE_EDGE_RISING>; /* MIO19 WLAN_IRQ 1V8 */
+		interrupts = <19 IRQ_TYPE_EDGE_RISING>; 
 	};
-};
+};*/
 
 /* SD1 with level shifter */
 &sdhci1 {
