@@ -14,6 +14,7 @@
 
 #include "zynqmp.dtsi"
 #include "zynqmp-clk.dtsi"
+#include <dt-bindings/interrupt-controller/irq.h>
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/phy/phy.h>
 
@@ -41,6 +42,20 @@
 	memory {
 		device_type = "memory";
 		reg = <0x0 0x0 0x0 0x80000000>, <0x8 0x00000000 0x0 0x80000000>;
+	};
+
+	wmmcsdio_fixed: fixedregulator-mmcsdio {
+		compatible = "regulator-fixed";
+		regulator-name = "wmmcsdio_fixed";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+		regulator-boot-on;
+	};
+
+	sdio_pwrseq: sdio_pwrseq {
+		compatible = "mmc-pwrseq-simple";
+		reset-gpios = <&gpio 17 GPIO_ACTIVE_LOW>; /* WIFI_EN */
 	};
 };
 
@@ -302,10 +317,32 @@
 	phys = <&lane3 PHY_TYPE_SATA 1 1 125000000>;
 };
 
+&sdhci0 {
+	status = "okay";
+	disable-wp;
+	xlnx,mio_bank = <0>;
+	non-removable;
+	cap-power-off-card;
+	bus-width = <0x4>;
+	mmc-pwrseq = <&sdio_pwrseq>;
+	max-frequency = <1000000>;
+	vqmmc-supply = <&wmmcsdio_fixed>;
+	#address-cells = <0x1>;
+	#size-cells = <0x0>;
+	wlcore: wlcore@2 {
+		compatible = "ti,wl1831";
+		reg = <2>;
+		interrupt-parent = <&gpio>;
+		interrupts = <19 IRQ_TYPE_EDGE_RISING>; /* MIO19 WLAN_IRQ 1V8 */
+	};
+};
+
 /* SD1 with level shifter */
 &sdhci1 {
 	status = "okay";
+	disable-wp;
 	no-1-8-v;	/* for 1.0 silicon */
+	xlnx,mio_bank = <1>;
 };
 
 &serdes {
